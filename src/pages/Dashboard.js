@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { DropdownComponent } from "../components/Dropdown.component"
 import { TableComponent } from "../components/Table.component"
 import useFilesData from "../hooks/useFilesData.hook"

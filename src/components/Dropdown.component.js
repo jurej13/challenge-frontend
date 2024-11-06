@@ -6,7 +6,6 @@ export const DropdownComponent = ({ options, onSelect, searchTerm }) => {
 		<section className='d-flex gap-3 align-items-center'>
 			<Dropdown
 				onSelect={(eventKey) => {
-					console.log("asd", eventKey)
 					onSelect(eventKey)
 				}}
 			>
