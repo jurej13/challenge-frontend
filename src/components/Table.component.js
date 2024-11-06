@@ -2,7 +2,6 @@ import PropTypes from "prop-types"
 import { Table } from "react-bootstrap"
 
 export const TableComponent = ({ data }) => {
-	console.log(data)
 	return (
 		<Table striped bordered hover>
 			<thead>

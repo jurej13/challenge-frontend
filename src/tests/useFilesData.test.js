@@ -1,14 +1,17 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import React from "react"
 import useFilesData from "../hooks/useFilesData.hook"
 
 const TestComponent = () => {
-	const { data, loading, error } = useFilesData()
-
+	const { data, loading, error, setSearchTerm } = useFilesData()
+	const handleSearch = (searchTerm) => {
+		setSearchTerm(searchTerm)
+	}
 	return (
 		<>
 			{loading && <p>Loading...</p>}
 			{error && <p>{error}</p>}
+			<button onClick={() => handleSearch("test1")}>Search for test1</button>
 			{data &&
 				data.map((item, index) => (
 					<div key={index}>
@@ -71,14 +74,40 @@ describe("useFilesData", () => {
 		expect(screen.getByText("456")).toBeInTheDocument()
 		expect(screen.getByText("def456")).toBeInTheDocument()
 	})
-})
+	it("should update data when search term is changed.", async () => {
+		const mockData = [
+			{
+				file: "test1.txt",
+				lines: [{ text: "line 1", number: 123, hex: "abc123" }],
+			},
+		]
 
-it("should display an error message when fetch fails.", async () => {
-	fetch.mockRejectedValueOnce(new Error("Network Error"))
+		fetch.mockResolvedValueOnce({
+			ok: true,
+			json: async () => mockData,
+		})
 
-	render(<TestComponent />)
+		render(<TestComponent />)
 
-	expect(await screen.findByText("Network Error")).toBeInTheDocument()
+		fireEvent.click(screen.getByText("Search for test1"))
 
-	expect(screen.queryByText("test.txt")).not.toBeInTheDocument()
+		await waitFor(() =>
+			expect(screen.queryByText("Loading...")).not.toBeInTheDocument()
+		)
+
+		const fileName = screen.getByText("test1.txt")
+		expect(fileName).toBeInTheDocument()
+		expect(screen.getByText("line 1")).toBeInTheDocument()
+		expect(screen.getByText("123")).toBeInTheDocument()
+		expect(screen.getByText("abc123")).toBeInTheDocument()
+	})
+	it("should display an error message when fetch fails.", async () => {
+		fetch.mockRejectedValueOnce(new Error("Network Error"))
+
+		render(<TestComponent />)
+
+		expect(await screen.findByText("Network Error")).toBeInTheDocument()
+
+		expect(screen.queryByText("test.txt")).not.toBeInTheDocument()
+	})
 })
